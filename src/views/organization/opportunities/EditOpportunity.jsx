@@ -11,18 +11,16 @@ import {
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
+import { v4 as uuidv4 } from "uuid";
+
 import { useSelector, useDispatch } from "react-redux";
 
 import Skills from "./Skills";
 
 import { getAsync } from "../../../redux/oppCategories/oppCategories.slice";
-import { addAsync } from "../../../redux/opportunities/opportunities.slice";
+import { updateAsync } from "../../../redux/opportunities/opportunities.slice";
 
-import { useCookies } from "react-cookie";
-
-const CreateOpportunity = ({ handleClose }) => {
-  const [cookie] = useCookies(["user"]);
-
+const EditOpportunity = ({ handleClose, item }) => {
   const [opportunity, setOpportunity] = useState({
     title: "",
     categoryId: "",
@@ -37,6 +35,25 @@ const CreateOpportunity = ({ handleClose }) => {
     skills: "",
   });
 
+  useEffect(() => {
+    setOpportunity({
+      ...opportunity,
+      title: item.title,
+      date: item.date,
+      startTime: item.startTime,
+      endTime: item.endTime,
+      city: item.city,
+      state: item.state,
+      zipCode: item.zipCode,
+      volunteersNeeded: item.volunteersNeeded,
+      description: item.description,
+      skills: item.skills.map((skill) => ({
+        id: uuidv4(),
+        skill,
+      })),
+    });
+  }, [item]);
+
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.oppCategories.oppCategories);
 
@@ -44,17 +61,24 @@ const CreateOpportunity = ({ handleClose }) => {
     dispatch(getAsync());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (categories.length > 0) {
+      const selectedCategory = categories.find(
+        (c) => c._id === item.category._id
+      );
+
+      setOpportunity({ ...opportunity, categoryId: selectedCategory._id });
+    }
+  }, [categories]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const org = cookie["user"];
-    const organizationId = org._id;
-
-    const reqObj = { ...opportunity, organizationId };
+    const reqObj = { ...item, ...opportunity };
 
     reqObj.skills = opportunity.skills.map((item) => item.skill);
 
-    dispatch(addAsync(reqObj));
+    dispatch(updateAsync(reqObj));
 
     // Show success message
     handleClose();
@@ -80,7 +104,7 @@ const CreateOpportunity = ({ handleClose }) => {
     >
       <Box sx={{ my: 3, textAlign: "center" }}>
         <Typography color="primary" variant="h4" sx={{ mb: 1 }}>
-          Create Opportunity
+          Edit Opportunity
         </Typography>
       </Box>
       {/* Title */}
@@ -122,23 +146,25 @@ const CreateOpportunity = ({ handleClose }) => {
         label="Volunteers Needed"
       />
       {/* Category */}
-      <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
-        <InputLabel>Category</InputLabel>
-        <Select
-          value={opportunity.categoryId}
-          label="Category"
-          name="categoryId"
-          onChange={handleChange}
-          fullWidth
-        >
-          {categories.length > 0 &&
-            categories.map(({ _id, name }, index) => (
-              <MenuItem key={index} value={_id}>
-                {name}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
+      {categories.length > 0 && (
+        <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
+          <InputLabel>Category</InputLabel>
+          <Select
+            value={opportunity.categoryId}
+            label="Category"
+            name="categoryId"
+            onChange={handleChange}
+            fullWidth
+          >
+            {categories.length > 0 &&
+              categories.map(({ _id, name }, index) => (
+                <MenuItem key={index} value={_id}>
+                  {name}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+      )}
 
       {/* Commitment */}
       {/* Date */}
@@ -245,10 +271,10 @@ const CreateOpportunity = ({ handleClose }) => {
         sx={{ mt: 10, mb: 2 }}
         onClick={handleSubmit}
       >
-        Create
+        Update
       </Button>
     </Box>
   );
 };
 
-export default CreateOpportunity;
+export default EditOpportunity;

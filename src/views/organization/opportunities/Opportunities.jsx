@@ -1,13 +1,7 @@
 import {
-  Avatar,
   Box,
   Button,
-  Container,
   Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Table,
   TableHead,
   TableBody,
@@ -27,25 +21,36 @@ import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import CreateOpportunity from "./CreateOpportunity";
+import EditOpportunity from "./EditOpportunity";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import {
-  getAsync as getOpportunities,
-  addAsync as addOpportunity,
-} from "../../../redux/opportunities/opportunities.slice";
+import { getAsync as getOpportunities } from "../../../redux/opportunities/opportunities.slice";
 
 const Opportunities = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const isLoading = useSelector((state) => state.opportunities.isLoading);
   const opportunities = useSelector(
     (state) => state.opportunities.opportunities
   );
   const dispatch = useDispatch();
 
+  const [draft, setDraft] = useState({});
+
+  const edit = (id) => {
+    setDraft(() => opportunities.find(({ _id }) => id === _id));
+
+    setIsEditModalOpen(true);
+  };
+
   useEffect(() => {
     dispatch(getOpportunities());
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   console.log(opportunities);
+  // }, [opportunities]);
 
   return (
     <Box
@@ -57,6 +62,11 @@ const Opportunities = () => {
       <AddModal
         open={isAddModalOpen}
         handleClose={() => setIsAddModalOpen(false)}
+      />
+      <EditModal
+        open={isEditModalOpen}
+        handleClose={() => setIsEditModalOpen(false)}
+        item={draft}
       />
       <Typography variant="h5" color="custom.main" sx={{ px: 2, py: 1 }}>
         Opportunities
@@ -157,7 +167,7 @@ const Opportunities = () => {
                         </TableCell>
                         <TableCell>{new Date(date).toDateString()}</TableCell>
                         <TableCell>
-                          <IconButton color="success">
+                          <IconButton color="success" onClick={() => edit(_id)}>
                             <EditIcon />
                           </IconButton>
                           <IconButton color="custom">
@@ -192,32 +202,13 @@ const AddModal = ({ open, handleClose }) => {
   );
 };
 
-const styles = {
-  card: {
-    width: 250,
-    height: 250,
-    m: 2,
-    boxShadow: (theme) => theme.shadows[20],
-    borderRadius: 1,
-
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-
-    transition: "0.25s all ease-in-out",
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    m: 2,
-    background: (theme) => theme.palette.custom.main,
-    borderRadius: 50,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
-  },
+const EditModal = ({ open, handleClose, item }) => {
+  return (
+    <Dialog scroll="paper" onClose={handleClose} open={open}>
+      <EditOpportunity handleClose={handleClose} item={item} />
+    </Dialog>
+  );
 };
+
 
 export default Opportunities;
