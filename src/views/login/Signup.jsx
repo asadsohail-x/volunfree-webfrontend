@@ -17,7 +17,8 @@ import { useSelector, useDispatch } from "react-redux";
 import Experiences from "./Experiences";
 import Skills from "./Skills";
 
-import { getAsync } from "../../redux/genders/genders.slice";
+import { getAsync as getGenders } from "../../redux/genders/genders.slice";
+import { getAsync as getOrgTypes } from "../../redux/orgTypes/orgTypes.slice";
 import { ConstructionOutlined } from "@mui/icons-material";
 
 const VolunteerSignup = ({ signup, hide }) => {
@@ -39,7 +40,7 @@ const VolunteerSignup = ({ signup, hide }) => {
   const genders = useSelector((state) => state.genders.genders);
 
   useEffect(() => {
-    dispatch(getAsync());
+    dispatch(getGenders());
   }, [dispatch]);
 
   useEffect(() => {
@@ -233,9 +234,9 @@ const VolunteerSignup = ({ signup, hide }) => {
   );
 };
 
-const OrgSignup = ({ login, hide }) => {
-  const [orgState, setOrgState] = useState({
-    orgName: "",
+const OrgSignup = ({ signup, hide }) => {
+  const [org, setOrg] = useState({
+    name: "",
     contactName: "",
     email: "",
     password: "",
@@ -246,19 +247,46 @@ const OrgSignup = ({ login, hide }) => {
     zipCode: "",
     country: "",
     description: "",
+    orgType: "",
   });
+
+  const dispatch = useDispatch();
+  const orgTypes = useSelector((state) => state.orgTypes.orgTypes);
+
+  useEffect(() => {
+    dispatch(getOrgTypes());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log(orgTypes);
+  }, [orgTypes]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const newOrg = {
+      name: org.name,
+      contactName: org.contactName,
+      email: org.email,
+      password: org.password,
+      phoneNo: org.phoneNo,
+      streetAddress: org.streetAddress,
+      city: org.city,
+      state: org.state,
+      zipCode: org.zipCode,
+      country: org.country,
+      description: org.description,
+      orgTypeId: org.orgType,
+    };
+
+    console.log(newOrg);
+
     // send request to the server for the check which role this is
-    console.log("Signing up");
-    login();
-    hide();
+    signup(newOrg);
   };
 
   const handleChange = ({ target }) => {
-    setOrgState({ ...orgState, [target.name]: target.value });
+    setOrg({ ...org, [target.name]: target.value });
   };
 
   return (
@@ -296,14 +324,32 @@ const OrgSignup = ({ login, hide }) => {
           <TextField
             fullWidth
             margin="normal"
-            name="orgName"
+            name="name"
             onChange={handleChange}
             type="text"
-            value={orgState.orgName}
+            value={org.orgName}
             color="primary"
             variant="outlined"
             label="Organization Name"
           />
+          {/* Gender */}
+          <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
+            <InputLabel>Organization Type</InputLabel>
+            <Select
+              value={org.orgType}
+              label="Organization Type"
+              name="orgType"
+              onChange={handleChange}
+              fullWidth
+            >
+              {orgTypes.length > 0 &&
+                orgTypes.map(({ _id, name }, index) => (
+                  <MenuItem key={index} value={_id}>
+                    {name}
+                  </MenuItem>
+                ))}
+            </Select>
+          </FormControl>
           {/* Contact Name */}
           <TextField
             fullWidth
@@ -311,7 +357,7 @@ const OrgSignup = ({ login, hide }) => {
             name="contactName"
             onChange={handleChange}
             type="text"
-            value={orgState.contactName}
+            value={org.contactName}
             color="primary"
             variant="outlined"
             label="Contact Name"
@@ -323,7 +369,7 @@ const OrgSignup = ({ login, hide }) => {
             name="email"
             onChange={handleChange}
             type="email"
-            value={orgState.email}
+            value={org.email}
             color="primary"
             variant="outlined"
             label="Email Address"
@@ -334,8 +380,8 @@ const OrgSignup = ({ login, hide }) => {
             margin="normal"
             name="password"
             onChange={handleChange}
-            type="passwprd"
-            value={orgState.password}
+            type="password"
+            value={org.password}
             color="primary"
             variant="outlined"
             label="Password"
@@ -347,7 +393,7 @@ const OrgSignup = ({ login, hide }) => {
             name="phoneNo"
             onChange={handleChange}
             type="text"
-            value={orgState.phoneNo}
+            value={org.phoneNo}
             color="primary"
             variant="outlined"
             label="Phone Number"
@@ -359,7 +405,7 @@ const OrgSignup = ({ login, hide }) => {
             name="streetAddress"
             onChange={handleChange}
             type="text"
-            value={orgState.streetAddress}
+            value={org.streetAddress}
             color="primary"
             variant="outlined"
             label="Street Address"
@@ -371,7 +417,7 @@ const OrgSignup = ({ login, hide }) => {
             name="city"
             onChange={handleChange}
             type="text"
-            value={orgState.city}
+            value={org.city}
             color="primary"
             variant="outlined"
             label="City"
@@ -383,7 +429,7 @@ const OrgSignup = ({ login, hide }) => {
             name="state"
             onChange={handleChange}
             type="text"
-            value={orgState.state}
+            value={org.state}
             color="primary"
             variant="outlined"
             label="State"
@@ -395,7 +441,7 @@ const OrgSignup = ({ login, hide }) => {
             name="zipCode"
             onChange={handleChange}
             type="text"
-            value={orgState.zipCode}
+            value={org.zipCode}
             color="primary"
             variant="outlined"
             label="Zip Code"
@@ -407,7 +453,7 @@ const OrgSignup = ({ login, hide }) => {
             name="country"
             onChange={handleChange}
             type="text"
-            value={orgState.country}
+            value={org.country}
             color="primary"
             variant="outlined"
             label="Country"
@@ -419,7 +465,7 @@ const OrgSignup = ({ login, hide }) => {
             name="description"
             onChange={handleChange}
             type="text"
-            value={orgState.description}
+            value={org.description}
             color="primary"
             variant="outlined"
             label="Organization Description"
@@ -446,12 +492,12 @@ const OrgSignup = ({ login, hide }) => {
   );
 };
 
-const Signup = ({ role, signup, ...rest }) => {
+const Signup = ({ role, ...rest }) => {
   switch (role.toUpperCase()) {
     case "VOLUNTEER":
-      return <VolunteerSignup signup={signup} {...rest} />;
+      return <VolunteerSignup {...rest} />;
     default:
-      return <OrgSignup login={signup} {...rest} />;
+      return <OrgSignup {...rest} />;
   }
 };
 

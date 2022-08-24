@@ -28,6 +28,14 @@ import {
   markAsLoggedIn as markVolunteerAsLoggedIn,
 } from "./redux/volunteer/volunteer.slice";
 
+import {
+  loginAsync as orgLogin,
+  clear as clearOrg,
+  signupAsync as orgSignup,
+  set as setOrg,
+  markAsLoggedIn as markOrgAsLoggedIn,
+} from "./redux/organization/organization.slice";
+
 const App = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState("Admin");
@@ -37,6 +45,7 @@ const App = () => {
   const dispatch = useDispatch();
   const adminState = useSelector((state) => state.admin);
   const volunteerState = useSelector((state) => state.volunteer);
+  const organizationState = useSelector((state) => state.organization);
 
   useEffect(() => {
     if (cookie["user"]) {
@@ -64,7 +73,7 @@ const App = () => {
           }
           case "ORGANIZATION": {
             setIsLoading(true);
-            console.log("Organization", data);
+            dispatch(setOrg(data));
             break;
           }
         }
@@ -109,6 +118,22 @@ const App = () => {
     }
   }, [volunteerState]);
 
+  useEffect(() => {
+    if (!organizationState.isLoading) {
+      if (!organizationState.isLoggedIn) {
+        if (organizationState.data.token) {
+          setCookie(
+            "user",
+            { ...organizationState.data, role: role },
+            { path: "/" }
+          );
+          setTimeout(() => setIsLoading(false), 1000);
+          dispatch(markOrgAsLoggedIn());
+        }
+      }
+    }
+  }, [organizationState]);
+
   const login = (email, password) => {
     switch (role.toUpperCase()) {
       case "ADMIN": {
@@ -123,7 +148,7 @@ const App = () => {
       }
       case "ORGANIZATION": {
         setIsLoading(true);
-        console.log("Organization", { email, password });
+        dispatch(orgLogin(email, password));
         break;
       }
     }
@@ -138,7 +163,7 @@ const App = () => {
       }
       case "ORGANIZATION": {
         setIsLoading(true);
-        console.log("Organization", data);
+        dispatch(orgSignup(data));
         break;
       }
     }
@@ -161,7 +186,7 @@ const App = () => {
       }
       case "ORGANIZATION": {
         setIsLoading(false);
-        console.log("Organization logout");
+        dispatch(clearOrg());
         break;
       }
     }
