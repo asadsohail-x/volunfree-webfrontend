@@ -19,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -28,9 +28,24 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import CreateOpportunity from "./CreateOpportunity";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  getAsync as getOpportunities,
+  addAsync as addOpportunity,
+} from "../../../redux/opportunities/opportunities.slice";
+
 const Opportunities = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const isLoading = false;
+  const isLoading = useSelector((state) => state.opportunities.isLoading);
+  const opportunities = useSelector(
+    (state) => state.opportunities.opportunities
+  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getOpportunities());
+  }, [dispatch]);
 
   return (
     <Box
@@ -121,24 +136,45 @@ const Opportunities = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow hover>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Volunteers Needed</TableCell>
-                  <TableCell>Skills Required</TableCell>
-                  <TableCell>Event Date</TableCell>
-                  <TableCell>
-                    <IconButton color="success">
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton color="custom">
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton color="error">
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                {opportunities.length > 0 ? (
+                  opportunities.map(
+                    (
+                      { _id, title, category, volunteersNeeded, skills, date },
+                      i
+                    ) => (
+                      <TableRow hover key={i}>
+                        <TableCell>{title}</TableCell>
+                        <TableCell>{category.name}</TableCell>
+                        <TableCell>{volunteersNeeded}</TableCell>
+                        <TableCell>
+                          {skills.length > 0
+                            ? skills.map((skill, index) => (
+                                <Fragment key={index}>
+                                  {skill} <br />
+                                </Fragment>
+                              ))
+                            : "-"}
+                        </TableCell>
+                        <TableCell>{new Date(date).toDateString()}</TableCell>
+                        <TableCell>
+                          <IconButton color="success">
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton color="custom">
+                            <VisibilityIcon />
+                          </IconButton>
+                          <IconButton color="error">
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )
+                ) : (
+                  <TableRow>
+                    <TableCell>No Opportunities</TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           </Box>
@@ -151,7 +187,7 @@ const Opportunities = () => {
 const AddModal = ({ open, handleClose }) => {
   return (
     <Dialog scroll="paper" onClose={handleClose} open={open}>
-      <CreateOpportunity />
+      <CreateOpportunity handleClose={handleClose} />
     </Dialog>
   );
 };

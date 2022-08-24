@@ -21,7 +21,7 @@ import { getAsync } from "../../../redux/oppCategories/oppCategories.slice";
 import { axiosPut } from "../../../api/axiosHelper";
 import { useCookies } from "react-cookie";
 
-const CreateOpportunity = () => {
+const CreateOpportunity = ({ handleClose }) => {
   const [cookie] = useCookies(["user"]);
 
   const [opportunity, setOpportunity] = useState({
@@ -50,11 +50,21 @@ const CreateOpportunity = () => {
 
     const org = cookie["user"];
     const organizationId = org._id;
-    console.log({ ...opportunity, organizationId });
 
-    axiosPut("opportunities/add", { ...opportunity, organizationId }).then(
-      (res) => console.log(res)
-    );
+    const reqObj = { ...opportunity, organizationId };
+
+    reqObj.skills = opportunity.skills.map((item) => item.skill);
+
+    // console.log(reqObj);
+
+    axiosPut("opportunities/add", reqObj).then((res) => {
+      if (res.data.success) {
+        // add to the opportunities state in redux
+
+        // close the modal
+        handleClose();
+      }
+    });
   };
 
   const handleChange = ({ target }) => {
@@ -105,6 +115,18 @@ const CreateOpportunity = () => {
         label="Description"
         multiline
         rows={10}
+      />
+      {/* Volunteers */}
+      <TextField
+        fullWidth
+        margin="normal"
+        name="volunteersNeeded"
+        onChange={handleChange}
+        type="text"
+        value={opportunity.volunteersNeeded}
+        color="primary"
+        variant="outlined"
+        label="Volunteers Needed"
       />
       {/* Category */}
       <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
