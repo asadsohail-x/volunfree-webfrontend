@@ -16,12 +16,7 @@ import {
 import { Fragment, useEffect, useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
-import CreateOpportunity from "./CreateOpportunity";
-import EditOpportunity from "./EditOpportunity";
 import ViewOpportunity from "./ViewOpportunity";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,8 +24,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAsync as getOpportunities } from "../../../redux/opportunities/opportunities.slice";
 
 const Opportunities = () => {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const isLoading = useSelector((state) => state.opportunities.isLoading);
   const opportunities = useSelector(
@@ -40,21 +33,9 @@ const Opportunities = () => {
 
   const [draft, setDraft] = useState({});
 
-  const edit = (id) => {
-    setDraft(() => opportunities.find(({ _id }) => id === _id));
-    setIsEditModalOpen(true);
-  };
-
   const view = (id) => {
     setDraft(() => opportunities.find(({ _id }) => id === _id));
     setIsViewModalOpen(true);
-  };
-
-  const del = (id) => {
-    console.log(
-      "Deleting",
-      opportunities.find(({ _id }) => id === _id)
-    );
   };
 
   useEffect(() => {
@@ -72,15 +53,6 @@ const Opportunities = () => {
         width: "100%",
       }}
     >
-      <AddModal
-        open={isAddModalOpen}
-        handleClose={() => setIsAddModalOpen(false)}
-      />
-      <EditModal
-        open={isEditModalOpen}
-        handleClose={() => setIsEditModalOpen(false)}
-        item={draft}
-      />
       <ViewModal
         open={isViewModalOpen}
         handleClose={() => setIsViewModalOpen(false)}
@@ -147,9 +119,6 @@ const Opportunities = () => {
                 </IconButton>
               </Box>
             </Box>
-            <Button variant="contained" onClick={() => setIsAddModalOpen(true)}>
-              Add
-            </Button>
           </Box>
           <Box sx={{ width: "100%" }}>
             <Table>
@@ -185,15 +154,9 @@ const Opportunities = () => {
                         </TableCell>
                         <TableCell>{new Date(date).toDateString()}</TableCell>
                         <TableCell>
-                          <IconButton color="success" onClick={() => edit(_id)}>
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton color="custom" onClick={() => view(_id)}>
-                            <VisibilityIcon />
-                          </IconButton>
-                          <IconButton color="error" onClick={() => del(id)}>
-                            <DeleteIcon />
-                          </IconButton>
+                          <Button color="custom" onClick={() => view(_id)}>
+                            View
+                          </Button>
                         </TableCell>
                       </TableRow>
                     )
@@ -209,22 +172,6 @@ const Opportunities = () => {
         </Box>
       )}
     </Box>
-  );
-};
-
-const AddModal = ({ open, handleClose }) => {
-  return (
-    <Dialog scroll="paper" onClose={handleClose} open={open}>
-      <CreateOpportunity handleClose={handleClose} />
-    </Dialog>
-  );
-};
-
-const EditModal = ({ open, handleClose, item }) => {
-  return (
-    <Dialog scroll="paper" onClose={handleClose} open={open}>
-      <EditOpportunity handleClose={handleClose} item={item} />
-    </Dialog>
   );
 };
 

@@ -108,4 +108,26 @@ export const delAsync = (id) => async (dispatch) => {
   }
 };
 
+export const applyAsync = (reqData) => async (dispatch) => {
+  try {
+    dispatch(startRequest());
+
+    const response = await axiosPut("opportunities/apply", reqData);
+
+    if (!response) dispatch(err("Something went wrong"));
+
+    const { data } = response;
+
+    if (data.success) {
+      dispatch(del(id));
+      dispatch(endRequest(true));
+    } else {
+      dispatch(err(data.message));
+    }
+  } catch (error) {
+    console.log(error);
+    dispatch(err("Something went wrong"));
+  }
+};
+
 export default opportunitiesSlice.reducer;
