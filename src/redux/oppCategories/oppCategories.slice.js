@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import reducers from "./oppCategories.reducers";
+
+import { axiosGet, axiosPut, axiosPatch, axiosDelete } from "../../api/axiosHelper";
 
 export const oppCategoriesSlice = createSlice({
   name: "oppCategories",
@@ -15,20 +16,10 @@ export const oppCategoriesSlice = createSlice({
 export const { startRequest, endRequest, set, del, err, add, update, filter } =
   oppCategoriesSlice.actions;
 
-export const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUyN2E1MGExZDE3NjU4ZmFhMjhhZDEiLCJlbWFpbCI6ImFzYWRAZ21haWwuY29tIiwiaWF0IjoxNjU5NTA1MzkwLCJleHAiOjE2NjIwMjUzOTB9.8LuW4DXFja1odoUeKdV8tY-aC8dW2iHZFIKARTbDc-I";
-
-const config = {
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUyN2E1MGExZDE3NjU4ZmFhMjhhZDEiLCJlbWFpbCI6ImFzYWRAZ21haWwuY29tIiwiaWF0IjoxNjU5NTA1MzkwLCJleHAiOjE2NjIwMjUzOTB9.8LuW4DXFja1odoUeKdV8tY-aC8dW2iHZFIKARTbDc-I`,
-  },
-};
-
 export const getAsync = () => async (dispatch) => {
   try {
     dispatch(startRequest());
-    const response = await axios.get("opp-categories/get-all", config);
+    const response = await axiosGet("opp-categories/get-all");
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -55,7 +46,7 @@ export const addAsync = (name) => async (dispatch) => {
     // omitting icon from the request
     const reqData = { name };
 
-    const response = await axios.put("opp-categories/add", reqData, config);
+    const response = await axiosPut("opp-categories/add", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -79,10 +70,9 @@ export const updateAsync = (name, id) => async (dispatch) => {
 
     const reqData = { id, name };
 
-    const response = await axios.patch(
+    const response = await axiosPatch(
       "opp-categories/update",
       reqData,
-      config
     );
 
     if (!response) dispatch(err("Something went wrong"));
@@ -105,7 +95,7 @@ export const delAsync = (id) => async (dispatch) => {
   try {
     dispatch(startRequest());
 
-    const response = await axios.delete(`opp-categories/delete/${id}`);
+    const response = await axiosDelete(`opp-categories/delete/${id}`);
 
     if (!response) dispatch(err("Something went wrong"));
 

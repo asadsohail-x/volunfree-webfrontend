@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import reducers from "./volunteer.reducers";
+
+import { axiosPut, axiosPost } from "../../api/axiosHelper";
 
 export const adminSlice = createSlice({
   name: "volunteer",
@@ -13,13 +14,8 @@ export const adminSlice = createSlice({
   reducers,
 });
 
-export const { startRequest, endRequest, set, err, clear, markAsLoggedIn } = adminSlice.actions;
-
-const config = {
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
+export const { startRequest, endRequest, set, err, clear, markAsLoggedIn } =
+  adminSlice.actions;
 
 export const loginAsync = (email, password) => async (dispatch) => {
   try {
@@ -27,7 +23,7 @@ export const loginAsync = (email, password) => async (dispatch) => {
 
     const reqData = { email, password };
 
-    const response = await axios.post("volunteers/login", reqData, config);
+    const response = await axiosPost("volunteers/login", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -49,7 +45,7 @@ export const signupAsync = (reqData) => async (dispatch) => {
   try {
     dispatch(startRequest());
 
-    const response = await axios.put("volunteers/signup", reqData, config);
+    const response = await axiosPut("volunteers/signup", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 

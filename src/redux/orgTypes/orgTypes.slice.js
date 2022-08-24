@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import reducers from "./orgTypes.reducers";
+
+import { axiosGet, axiosPut, axiosPatch, axiosDelete } from "../../api/axiosHelper";
 
 export const orgTypesSlice = createSlice({
   name: "orgTypes",
@@ -15,20 +16,10 @@ export const orgTypesSlice = createSlice({
 export const { startRequest, endRequest, set, del, err, add, update, filter } =
   orgTypesSlice.actions;
 
-export const token =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUyN2E1MGExZDE3NjU4ZmFhMjhhZDEiLCJlbWFpbCI6ImFzYWRAZ21haWwuY29tIiwiaWF0IjoxNjU5NTA1MzkwLCJleHAiOjE2NjIwMjUzOTB9.8LuW4DXFja1odoUeKdV8tY-aC8dW2iHZFIKARTbDc-I";
-
-const config = {
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmUyN2E1MGExZDE3NjU4ZmFhMjhhZDEiLCJlbWFpbCI6ImFzYWRAZ21haWwuY29tIiwiaWF0IjoxNjU5NTA1MzkwLCJleHAiOjE2NjIwMjUzOTB9.8LuW4DXFja1odoUeKdV8tY-aC8dW2iHZFIKARTbDc-I`,
-  },
-};
-
 export const getAsync = () => async (dispatch) => {
   try {
     dispatch(startRequest());
-    const response = await axios.get("org-types/get-all", config);
+    const response = await axiosGet("org-types/get-all");
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -55,7 +46,7 @@ export const addAsync = (name) => async (dispatch) => {
     // omitting icon from the request
     const reqData = { name };
 
-    const response = await axios.put("org-types/add", reqData, config);
+    const response = await axiosPut("org-types/add", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -79,7 +70,7 @@ export const updateAsync = (name, id) => async (dispatch) => {
 
     const reqData = { id, name };
 
-    const response = await axios.patch("org-types/update", reqData, config);
+    const response = await axiosPatch("org-types/update", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 
@@ -101,7 +92,7 @@ export const delAsync = (id) => async (dispatch) => {
   try {
     dispatch(startRequest());
 
-    const response = await axios.delete(`org-types/delete/${id}`);
+    const response = await axiosDelete(`org-types/delete/${id}`);
 
     if (!response) dispatch(err("Something went wrong"));
 

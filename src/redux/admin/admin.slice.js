@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import reducers from "./admin.reducers";
+
+import { axiosPut, axiosPost } from "../../api/axiosHelper";
 
 export const adminSlice = createSlice({
   name: "admin",
@@ -8,18 +9,13 @@ export const adminSlice = createSlice({
     isLoading: false,
     data: {},
     error: "",
-    isLoggedIn: false
+    isLoggedIn: false,
   },
   reducers,
 });
 
-export const { startRequest, endRequest, set, err, clear, markAsLoggedIn } = adminSlice.actions;
-
-const config = {
-  headers: {
-    "Content-Type": "application/json",
-  },
-};
+export const { startRequest, endRequest, set, err, clear, markAsLoggedIn } =
+  adminSlice.actions;
 
 export const loginAsync = (email, password) => async (dispatch) => {
   try {
@@ -27,7 +23,7 @@ export const loginAsync = (email, password) => async (dispatch) => {
 
     const reqData = { email, password };
 
-    const response = await axios.post("admin/login", reqData, config);
+    const response = await axiosPost("admin/login", reqData);
 
     if (!response) dispatch(err("Something went wrong"));
 

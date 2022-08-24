@@ -15,6 +15,8 @@ import ComplaintsSelectedIcon from "../assets/icons/complaints-s.png";
 import SettingsIcon from "../assets/icons/settings.png";
 import SettingsSelectedIcon from "../assets/icons/settings-s.png";
 
+import Opportunities from "../views/organization/opportunities/Opportunities";
+
 export const orgRoutes = [
   {
     icon: <CustomIcon src={DashboardIcon} />,
@@ -57,7 +59,7 @@ export const orgRoutes = [
 export const OrgRouter = () => (
   <Routes>
     <Route path="/" element={<>Dashboard </>} />
-    <Route path="/opportunities" element={<>Opportunities </>} />
+    <Route path="/opportunities" element={<Opportunities />} />
     <Route path="/track-opportunities" element={<>Track Opportunities </>} />
     <Route path="/logged-hours" element={<>Volunteer Logged Hours </>} />
     <Route path="/complaints" element={<>Complaints </>} />
