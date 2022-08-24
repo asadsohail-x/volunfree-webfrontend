@@ -21,6 +21,7 @@ import SettingsSelectedIcon from "../assets/icons/settings-s.png";
 // Components
 import Organizations from "../views/admin/organizations/Organizations";
 import OrgTypes from "../views/admin/organizationTypes/OrganizationTypes";
+import OppCategories from "../views/admin/oppCategories/OppCategories";
 
 export const adminRoutes = [
   {
@@ -53,8 +54,8 @@ export const adminRoutes = [
   {
     icon: <CustomIcon src={CategoriesIcon} />,
     selectedIcon: <CustomIcon src={CategoriesSelectedIcon} />,
-    title: "Shift Categories",
-    path: "/shift-categories",
+    title: "Opportunity Categories",
+    path: "/opp-categories",
   },
   {
     icon: <CustomIcon src={LogsIcon} />,
@@ -91,7 +92,7 @@ export const AdminRouter = () => (
     <Route path="/organizations" element={<Organizations />} />
     <Route path="/organization-types" element={<OrgTypes />} />
     <Route path="/volunteers" element={<>Volunteers </>} />
-    <Route path="/shift-categories" element={<>Shift Categories </>} />
+    <Route path="/opp-categories" element={<OppCategories />} />
     <Route path="/logged-hours" element={<>Volunteer Logged Hours </>} />
     <Route path="/complaints" element={<>Complaints </>} />
     <Route path="/complaint-types" element={<>Complaint Types </>} />
