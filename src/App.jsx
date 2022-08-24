@@ -12,10 +12,21 @@ import { AdminRouter, OrgRouter, VolunteerRouter } from "./router/AppRouter";
 import { useCookies } from "react-cookie";
 
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   loginAsync as adminLogin,
   clear as clearAdmin,
+  set as setAdmin,
+  markAsLoggedIn as markAdminAsLoggedIn,
 } from "./redux/admin/admin.slice";
+
+import {
+  loginAsync as volunteerLogin,
+  clear as clearVolunteer,
+  signupAsync as volunteerSignup,
+  set as setVolunteer,
+  markAsLoggedIn as markVolunteerAsLoggedIn,
+} from "./redux/volunteer/volunteer.slice";
 
 const App = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -25,10 +36,9 @@ const App = () => {
 
   const dispatch = useDispatch();
   const adminState = useSelector((state) => state.admin);
+  const volunteerState = useSelector((state) => state.volunteer);
 
   useEffect(() => {
-    console.log(cookie);
-
     if (cookie["user"]) {
       const user = cookie["user"];
 
@@ -36,7 +46,29 @@ const App = () => {
         // verify token
 
         // set logged in as true
-        setRole(user.role);
+
+        setRole(() => user.role);
+        const data = { ...user };
+        delete data.role;
+
+        switch (role.toUpperCase()) {
+          case "ADMIN": {
+            setIsLoading(true);
+            dispatch(setAdmin(data));
+            break;
+          }
+          case "VOLUNTEER": {
+            setIsLoading(true);
+            dispatch(setVolunteer(data));
+            break;
+          }
+          case "ORGANIZATION": {
+            setIsLoading(true);
+            console.log("Organization", data);
+            break;
+          }
+        }
+
         setLoggedIn(true);
         setTimeout(() => setIsLoading(false), 1000);
         return;
@@ -51,12 +83,31 @@ const App = () => {
 
   useEffect(() => {
     if (!adminState.isLoading) {
-      if (adminState.data.token) {
-        setCookie("user", { ...adminState.data, role: role }, { path: "/" });
-        setTimeout(() => setIsLoading(false), 1000);
+      if (!adminState.isLoggedIn) {
+        if (adminState.data.token) {
+          setCookie("user", { ...adminState.data, role: role }, { path: "/" });
+          setTimeout(() => setIsLoading(false), 1000);
+          dispatch(markAdminAsLoggedIn());
+        }
       }
     }
   }, [adminState]);
+
+  useEffect(() => {
+    if (!volunteerState.isLoading) {
+      if (!volunteerState.isLoggedIn) {
+        if (volunteerState.data.token) {
+          setCookie(
+            "user",
+            { ...volunteerState.data, role: role },
+            { path: "/" }
+          );
+          setTimeout(() => setIsLoading(false), 1000);
+          dispatch(markVolunteerAsLoggedIn());
+        }
+      }
+    }
+  }, [volunteerState]);
 
   const login = (email, password) => {
     switch (role.toUpperCase()) {
@@ -67,12 +118,27 @@ const App = () => {
       }
       case "VOLUNTEER": {
         setIsLoading(true);
-        console.log("Volunteer", { email, password });
+        dispatch(volunteerLogin(email, password));
         break;
       }
       case "ORGANIZATION": {
         setIsLoading(true);
         console.log("Organization", { email, password });
+        break;
+      }
+    }
+  };
+
+  const signup = (data) => {
+    switch (role.toUpperCase()) {
+      case "VOLUNTEER": {
+        setIsLoading(true);
+        dispatch(volunteerSignup(data));
+        break;
+      }
+      case "ORGANIZATION": {
+        setIsLoading(true);
+        console.log("Organization", data);
         break;
       }
     }
@@ -90,7 +156,7 @@ const App = () => {
       }
       case "VOLUNTEER": {
         setIsLoading(false);
-        console.log("Volunteer logout");
+        dispatch(clearVolunteer());
         break;
       }
       case "ORGANIZATION": {
@@ -128,7 +194,7 @@ const App = () => {
     }
   }
 
-  return <Login role={role} setRole={setRole} login={login} />;
+  return <Login role={role} setRole={setRole} login={login} signup={signup} />;
 };
 
 const Loader = () => (

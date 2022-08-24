@@ -50,8 +50,6 @@ export const addAsync = (name) => async (dispatch) => {
   try {
     dispatch(startRequest());
 
-    // need to call an API to the photo-bucket
-
     // omitting icon from the request
     const reqData = { name };
 

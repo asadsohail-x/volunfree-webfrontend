@@ -8,11 +8,12 @@ export const adminSlice = createSlice({
     isLoading: false,
     data: {},
     error: "",
+    isLoggedIn: false
   },
   reducers,
 });
 
-export const { startRequest, endRequest, set, err, clear } = adminSlice.actions;
+export const { startRequest, endRequest, set, err, clear, markAsLoggedIn } = adminSlice.actions;
 
 const config = {
   headers: {

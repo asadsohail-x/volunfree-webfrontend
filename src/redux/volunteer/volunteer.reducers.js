@@ -18,6 +18,9 @@ const reducers = {
     state.error = "";
     state.data = {};
   },
+  markAsLoggedIn: (state) => {
+    state.isLoggedIn = true;
+  },
 };
 
 export default reducers;

@@ -1,11 +1,26 @@
-import { useState } from "react";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
+import { useSelector, useDispatch } from "react-redux";
 
 import Experiences from "./Experiences";
 import Skills from "./Skills";
 
-const VolunteerSignup = ({ login, hide }) => {
+import { getAsync } from "../../redux/genders/genders.slice";
+import { ConstructionOutlined } from "@mui/icons-material";
+
+const VolunteerSignup = ({ signup, hide }) => {
   const [volunteer, setVolunteer] = useState({
     firstName: "",
     lastName: "",
@@ -13,19 +28,43 @@ const VolunteerSignup = ({ login, hide }) => {
     password: "",
     phoneNo: "",
     gender: "",
+    zipCode: "",
     dob: new Date(Date.now()),
   });
 
   const [experiences, setExperiences] = useState([]);
   const [skills, setSkills] = useState([]);
 
+  const dispatch = useDispatch();
+  const genders = useSelector((state) => state.genders.genders);
+
+  useEffect(() => {
+    dispatch(getAsync());
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log(genders);
+  }, [genders]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const newVolunteer = {
+      firstName: volunteer.firstName,
+      lastName: volunteer.lastName,
+      email: volunteer.email,
+      password: volunteer.password,
+      genderId: volunteer.gender,
+      DOB: volunteer.dob,
+      zipCode: volunteer.zipCode,
+      experiences,
+      skills,
+    };
+
+    console.log(newVolunteer);
+
     // send request to the server
-    console.log("Signing up");
-    login();
-    hide();
+    signup(newVolunteer);
   };
 
   const handleChange = ({ target }) => {
@@ -77,14 +116,14 @@ const VolunteerSignup = ({ login, hide }) => {
           variant="outlined"
           label="First Name"
         />
-        {/* Contact Name */}
+        {/* Last Name */}
         <TextField
           fullWidth
           margin="normal"
-          name="contactName"
+          name="lastName"
           onChange={handleChange}
           type="text"
-          value={volunteer.contactName}
+          value={volunteer.lastName}
           color="primary"
           variant="outlined"
           label="Last Name"
@@ -107,7 +146,7 @@ const VolunteerSignup = ({ login, hide }) => {
           margin="normal"
           name="password"
           onChange={handleChange}
-          type="passwprd"
+          type="password"
           value={volunteer.password}
           color="primary"
           variant="outlined"
@@ -126,16 +165,34 @@ const VolunteerSignup = ({ login, hide }) => {
           label="Phone Number"
         />
         {/* Gender */}
+        <FormControl fullWidth sx={{ mt: 3, mb: 2 }}>
+          <InputLabel>Gender</InputLabel>
+          <Select
+            value={volunteer.gender}
+            label="Gender"
+            name="gender"
+            onChange={handleChange}
+            fullWidth
+          >
+            {genders.length > 0 &&
+              genders.map(({ _id, name }, index) => (
+                <MenuItem key={index} value={_id}>
+                  {name}
+                </MenuItem>
+              ))}
+          </Select>
+        </FormControl>
+        {/* ZIP Code */}
         <TextField
           fullWidth
           margin="normal"
-          name="streetAddress"
+          name="zipCode"
           onChange={handleChange}
           type="text"
-          value={volunteer.gender}
+          value={volunteer.zipCode}
           color="primary"
           variant="outlined"
-          label="Gender"
+          label="ZIP Code"
         />
         {/* DOB */}
         <DatePicker
@@ -389,12 +446,12 @@ const OrgSignup = ({ login, hide }) => {
   );
 };
 
-const Signup = ({ role, login, ...rest }) => {
+const Signup = ({ role, signup, ...rest }) => {
   switch (role.toUpperCase()) {
     case "VOLUNTEER":
-      return <VolunteerSignup login={login} {...rest} />;
+      return <VolunteerSignup signup={signup} {...rest} />;
     default:
-      return <OrgSignup login={login} {...rest} />;
+      return <OrgSignup login={signup} {...rest} />;
   }
 };
 

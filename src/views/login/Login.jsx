@@ -12,7 +12,7 @@ import {
 
 import Signup from "./Signup";
 
-const LoginHandler = ({ login, role, setRole }) => {
+const LoginHandler = ({ login, signup, role, setRole }) => {
   const [hasSelectedRole, setHasSelectedRole] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
@@ -23,7 +23,7 @@ const LoginHandler = ({ login, role, setRole }) => {
 
   if (showSignup) {
     return (
-      <Signup hide={() => setShowSignup(false)} role={role} login={login} />
+      <Signup hide={() => setShowSignup(false)} role={role} signup={signup} />
     );
   }
 
