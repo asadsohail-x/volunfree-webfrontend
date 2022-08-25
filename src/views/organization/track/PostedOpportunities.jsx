@@ -1,32 +1,30 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  Table,
-  TableHead,
-  TableBody,
-  TableCell,
-  TableRow,
-  Divider,
-  IconButton,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, IconButton, TextField, Typography } from "@mui/material";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import ViewOpportunity from "./ViewOpportunity";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { getByVolunteerAsync as getOpportunities } from "../../../redux/opportunities/opportunities.slice";
+import {
+  getByOrganizationAsync as getOpportunities,
+  filter,
+} from "../../../redux/opportunities/opportunities.slice";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 
-const Opportunities = () => {
+import OpportunitiesTable from "./OpportunitiesTable";
+
+const Opportunities = ({ showMenu }) => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [filterText, setFilterText] = useState("");
+
   const [cookie] = useCookies(["user"]);
+
+  const navigate = useNavigate();
 
   const isLoading = useSelector((state) => state.opportunities.isLoading);
   const opportunities = useSelector(
@@ -45,9 +43,10 @@ const Opportunities = () => {
     dispatch(getOpportunities(cookie["user"]._id));
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   console.log(opportunities);
-  // }, [opportunities]);
+  const handleFilters = (text) => {
+    setFilterText(text);
+    dispatch(filter(text));
+  };
 
   return (
     <Box
@@ -56,13 +55,13 @@ const Opportunities = () => {
         width: "100%",
       }}
     >
-      <ViewModal
+      <ViewOpportunity
         open={isViewModalOpen}
         handleClose={() => setIsViewModalOpen(false)}
         item={draft}
       />
       <Typography variant="h5" color="custom.main" sx={{ px: 2, py: 1 }}>
-        Opportunities
+        Track Opportunities
       </Typography>
       <Divider
         sx={{
@@ -116,6 +115,8 @@ const Opportunities = () => {
                   size="small"
                   placeholder="Search"
                   color="custom"
+                  value={filterText}
+                  onChange={({ target: { value } }) => handleFilters(value)}
                 />
                 <IconButton variant="contained" sx={{ px: 2, color: "white" }}>
                   <SearchIcon />
@@ -123,66 +124,13 @@ const Opportunities = () => {
               </Box>
             </Box>
           </Box>
-          <Box sx={{ width: "100%" }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell>Volunteers Needed</TableCell>
-                  <TableCell>Skills Required</TableCell>
-                  <TableCell>Event Date</TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {opportunities.length > 0 ? (
-                  opportunities.map(
-                    (
-                      { _id, title, category, volunteersNeeded, skills, date },
-                      i
-                    ) => (
-                      <TableRow hover key={i}>
-                        <TableCell>{title}</TableCell>
-                        <TableCell>{category.name}</TableCell>
-                        <TableCell>{volunteersNeeded}</TableCell>
-                        <TableCell>
-                          {skills.length > 0
-                            ? skills.map((skill, index) => (
-                                <Fragment key={index}>
-                                  {skill} <br />
-                                </Fragment>
-                              ))
-                            : "-"}
-                        </TableCell>
-                        <TableCell>{new Date(date).toDateString()}</TableCell>
-                        <TableCell>
-                          <Button color="custom" onClick={() => view(_id)}>
-                            View
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  )
-                ) : (
-                  <TableRow>
-                    <TableCell>No Opportunities</TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </Box>
+          <OpportunitiesTable
+            opportunities={opportunities}
+            showMenu={showMenu}
+          />
         </Box>
       )}
     </Box>
-  );
-};
-
-const ViewModal = ({ open, handleClose, item }) => {
-  return (
-    <Dialog scroll="paper" onClose={handleClose} open={open}>
-      <ViewOpportunity handleClose={handleClose} item={item} />
-    </Dialog>
   );
 };
 

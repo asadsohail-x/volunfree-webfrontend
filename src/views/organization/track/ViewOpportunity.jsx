@@ -1,32 +1,14 @@
-import { useState } from "react";
 import {
   Box,
-  Button,
+  Dialog,
   Table,
   TableBody,
-  TableRow,
   TableCell,
+  TableRow,
   Typography,
 } from "@mui/material";
-import { useCookies } from "react-cookie";
-
-import { applyAsync } from "../../../redux/opportunities/opportunities.slice";
-import { useDispatch } from "react-redux";
 
 const ViewOpportunity = ({ handleClose, item }) => {
-  const [cookie] = useCookies("user");
-
-  const dispatch = useDispatch("user");
-
-  const apply = () => {
-    const opportunityId = item._id;
-    const volunteerId = cookie["user"]._id;
-
-    dispatch(applyAsync({ opportunityId, volunteerId }));
-
-    handleClose();
-  };
-
   return (
     <Box
       sx={{
@@ -69,17 +51,6 @@ const ViewOpportunity = ({ handleClose, item }) => {
           <Label value={s} key={i} horizontal />
         ))}
       </Box>
-
-      <Button
-        color="primary"
-        fullWidth
-        size="large"
-        variant="contained"
-        sx={{ mt: 10, mb: 2 }}
-        onClick={apply}
-      >
-        Apply
-      </Button>
     </Box>
   );
 };
@@ -144,4 +115,12 @@ const Label = ({ label, value, horizontal }) => {
   );
 };
 
-export default ViewOpportunity;
+const ViewModal = ({ open, handleClose, item }) => {
+  return (
+    <Dialog scroll="paper" onClose={handleClose} open={open}>
+      <ViewOpportunity handleClose={handleClose} item={item} />
+    </Dialog>
+  );
+};
+
+export default ViewModal;

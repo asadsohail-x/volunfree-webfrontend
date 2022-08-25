@@ -16,6 +16,8 @@ import SettingsIcon from "../assets/icons/settings.png";
 import SettingsSelectedIcon from "../assets/icons/settings-s.png";
 
 import Opportunities from "../views/organization/opportunities/Opportunities";
+import Track from "../views/organization/track/Track";
+import AppliedVolunteers from "../views/organization/track/AppliedVolunteers";
 
 export const orgRoutes = [
   {
@@ -34,7 +36,7 @@ export const orgRoutes = [
     icon: <CustomIcon src={TrackIcon} />,
     selectedIcon: <CustomIcon src={TrackSelectedIcon} />,
     title: "Track Opportunities",
-    path: "/track-opportunities",
+    path: "/track",
   },
   {
     icon: <CustomIcon src={LogsIcon} />,
@@ -60,7 +62,8 @@ export const OrgRouter = () => (
   <Routes>
     <Route path="/" element={<>Dashboard </>} />
     <Route path="/opportunities" element={<Opportunities />} />
-    <Route path="/track-opportunities" element={<>Track Opportunities </>} />
+    <Route path="/track" element={<Track />} />
+    <Route path="/applied-volunteers" element={<AppliedVolunteers />} />
     <Route path="/logged-hours" element={<>Volunteer Logged Hours </>} />
     <Route path="/complaints" element={<>Complaints </>} />
     <Route path="/settings" element={<>Settings </>} />

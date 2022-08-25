@@ -16,6 +16,11 @@ import SettingsIcon from "../assets/icons/settings.png";
 import SettingsSelectedIcon from "../assets/icons/settings-s.png";
 
 import Opportunities from "../views/volunteer/opportunities/Opportunities";
+import Track from "../views/volunteer/track/Track";
+import AppliedOpportunities from "../views/volunteer/track/AppliedOpportunities";
+import ApprovedOpportunities from "../views/volunteer/track/ApprovedOpportunities";
+import UpcomingOpportunities from "../views/volunteer/track/UpcomingOpportunities";
+import PastOpportunities from "../views/volunteer/track/PastOpportunities";
 
 export const volunteerRoutes = [
   {
@@ -34,7 +39,7 @@ export const volunteerRoutes = [
     icon: <CustomIcon src={TrackIcon} />,
     selectedIcon: <CustomIcon src={TrackSelectedIcon} />,
     title: "Track Opportunities",
-    path: "/track-opportunities",
+    path: "/track",
   },
   {
     icon: <CustomIcon src={LogsIcon} />,
@@ -60,7 +65,13 @@ export const VolunteerRouter = () => (
   <Routes>
     <Route path="/" element={<>Dashboard </>} />
     <Route path="/opportunities" element={<Opportunities />} />
-    <Route path="/track-opportunities" element={<>Track Opportunities </>} />
+    <Route path="/track" element={<Track />} />
+    <Route path="/applied-opportunities" element={<AppliedOpportunities />} />
+    <Route path="/approved-opportunities" element={<ApprovedOpportunities />} />
+    <Route path="/upcoming-opportunities" element={<UpcomingOpportunities />} />
+    <Route path="/past-opportunities" element={<PastOpportunities />} />
+    <Route path="/upcoming-opportunities" element={<>Upcoming </>} />
+    <Route path="/past-opportunities" element={<>Past </>} />
     <Route path="/logged-hours" element={<>Logged Hours </>} />
     <Route path="/complaints" element={<>Complaints </>} />
     <Route path="/settings" element={<>Settings </>} />
