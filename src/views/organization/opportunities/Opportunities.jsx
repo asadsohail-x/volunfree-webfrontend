@@ -61,10 +61,6 @@ const Opportunities = () => {
     dispatch(getOpportunities());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   console.log(opportunities);
-  // }, [opportunities]);
-
   return (
     <Box
       component="main"
@@ -191,7 +187,7 @@ const Opportunities = () => {
                           <IconButton color="custom" onClick={() => view(_id)}>
                             <VisibilityIcon />
                           </IconButton>
-                          <IconButton color="error" onClick={() => del(id)}>
+                          <IconButton color="error" onClick={() => del(_id)}>
                             <DeleteIcon />
                           </IconButton>
                         </TableCell>

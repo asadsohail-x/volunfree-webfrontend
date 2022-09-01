@@ -43,7 +43,7 @@ const Opportunities = () => {
 
   useEffect(() => {
     dispatch(getOpportunities(cookie["user"]._id));
-  }, [dispatch]);
+  }, [cookie, dispatch]);
 
   // useEffect(() => {
   //   console.log(opportunities);

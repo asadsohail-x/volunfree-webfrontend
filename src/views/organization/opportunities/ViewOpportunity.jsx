@@ -1,7 +1,5 @@
-import { useState } from "react";
 import {
   Box,
-  Button,
   Table,
   TableBody,
   TableRow,
@@ -9,7 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 
-const ViewOpportunity = ({ handleClose, item }) => {
+const ViewOpportunity = ({ item }) => {
   return (
     <Box
       sx={{

@@ -145,7 +145,8 @@ const CreateOpportunity = ({ handleClose }) => {
       <InputLabel sx={{ m: 1 }}>Commitment Date</InputLabel>
       <DatePicker
         label="Date"
-        inputFormat="dd/MM/yyyy"
+        inputFormat="dd MMM yyyy"
+        disableMaskedInput
         value={opportunity.date}
         onChange={(date) => setOpportunity({ ...opportunity, date })}
         renderInput={(p) => (

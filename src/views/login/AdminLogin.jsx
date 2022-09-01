@@ -1,50 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
-  Link,
-  Checkbox,
-  FormControlLabel,
   Container,
   TextField,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
-import Signup from "./Signup";
+import { clear, loginAsync } from "../../redux/admin/admin.slice";
+import Loader from "../../Loader";
 
-const LoginHandler = ({ login, signup, role, setRole }) => {
-  const [hasSelectedRole, setHasSelectedRole] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
-
-  if (showSignup) {
-    return (
-      <Signup hide={() => setShowSignup(false)} role={role} signup={signup} />
-    );
-  }
-
-  if (hasSelectedRole) {
-    return (
-      <Login
-        login={login}
-        role={role}
-        signup={() => setShowSignup(true)}
-        selectRole={() => setHasSelectedRole(false)}
-      />
-    );
-  }
-};
-
-const Login = ({ login, selectRole, role, signup }) => {
+const OrgLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isCheckedRememberMe, setIsCheckedRememberMe] = useState(false);
+  // const [isCheckedRememberMe, setIsCheckedRememberMe] = useState(false);
+
+  const [, setCookie] = useCookies(["user"]);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const isLoggedIn = useSelector((state) => state.admin.isLoggedIn);
+  const isLoading = useSelector((state) => state.admin.isLoading);
+  const data = useSelector((state) => state.admin.data);
+  const error = useSelector((state) => state.admin.error);
+
+  useEffect(() => {
+    if (!isLoading && error) {
+      console.log(isLoading, error);
+      toast.error(error);
+    }
+
+    return () => {
+      dispatch(clear());
+    };
+  }, [error, isLoading, dispatch]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // validate if the email and password are valid or not
-    login(email, password);
+    // Dispatch Login Action
+    dispatch(loginAsync(email, password));
   };
+
+  // handle admin state change
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        if (Object.keys(data).length) {
+          setCookie("user", { ...data, role: "Admin", loggedIn: true });
+          navigate("/");
+        }
+      }
+    }
+  }, [data, isLoading, isLoggedIn, navigate, setCookie]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Box
@@ -62,7 +79,10 @@ const Login = ({ login, selectRole, role, signup }) => {
       <Container
         maxWidth="sm"
         sx={{ py: 6, background: "white", borderRadius: 5 }}
-        style={{ paddingLeft: "100px", paddingRight: "100px" }}
+        style={{
+          paddingLeft: "calc(100vw * 0.05)",
+          paddingRight: "calc(100vw * 0.05)",
+        }}
       >
         <form onSubmit={handleSubmit}>
           <Box sx={{ my: 3, textAlign: "center" }}>
@@ -77,9 +97,9 @@ const Login = ({ login, selectRole, role, signup }) => {
               Sign In as{" "}
               <span
                 style={{ cursor: "pointer", fontWeight: "bold" }}
-                onClick={selectRole}
+                onClick={() => navigate("/")}
               >
-                {role}
+                Admin
               </span>{" "}
               to get started with Volunfree
             </Typography>
@@ -107,11 +127,11 @@ const Login = ({ login, selectRole, role, signup }) => {
             placeholder="Enter Password"
           />
 
-          <Box
+          {/* <Box
             sx={{
               py: 2,
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "center",
               alignItems: "center",
               width: "100%",
             }}
@@ -127,14 +147,7 @@ const Login = ({ login, selectRole, role, signup }) => {
               label="Remember Me"
               sx={{ color: (theme) => theme.palette.custom.accent }}
             />
-            <Link
-              href="#"
-              underline="none"
-              sx={{ color: (theme) => theme.palette.custom.accent }}
-            >
-              Forgot Password?
-            </Link>
-          </Box>
+          </Box> */}
 
           <Box
             sx={{
@@ -150,20 +163,9 @@ const Login = ({ login, selectRole, role, signup }) => {
               size="large"
               type="submit"
               variant="contained"
-              sx={{ mr: 2 }}
+              sx={{ mt: 3 }}
             >
               Sign In
-            </Button>
-            <Button
-              color="primary"
-              fullWidth
-              size="large"
-              type="submit"
-              variant="contained"
-              sx={{ ml: 2 }}
-              onClick={signup}
-            >
-              Sign Up
             </Button>
           </Box>
           <Box
@@ -179,7 +181,7 @@ const Login = ({ login, selectRole, role, signup }) => {
             <Button
               color="primary"
               sx={{ m: 0 }}
-              onClick={selectRole}
+              onClick={() => navigate("/")}
               variant="outlined"
             >
               Change Role
@@ -191,4 +193,4 @@ const Login = ({ login, selectRole, role, signup }) => {
   );
 };
 
-export default LoginHandler;
+export default OrgLogin;

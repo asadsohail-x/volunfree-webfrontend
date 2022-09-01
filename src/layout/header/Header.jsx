@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import { useCookies } from "react-cookie";
+import { useEffect, useState } from "react";
 
 const HeaderRoot = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.custom.main,
@@ -16,6 +18,22 @@ const HeaderRoot = styled(AppBar)(({ theme }) => ({
 }));
 
 const Header = ({ onSidebarOpen, logout, ...other }) => {
+  const [cookie] = useCookies(["user"]);
+  const [name, setName] = useState("");
+
+  useEffect(() => {
+    const user = cookie["user"];
+
+    switch (user.role.toUpperCase()) {
+      case "VOLUNTEER": {
+        setName(`${user.firstName} ${user.lastName}`);
+        break;
+      }
+      default:
+        setName(user.name);
+    }
+  }, [cookie, setName]);
+
   return (
     <>
       <HeaderRoot
@@ -58,15 +76,17 @@ const Header = ({ onSidebarOpen, logout, ...other }) => {
             <NotificationsIcon />
           </IconButton>
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h6">Volunteer</Typography>
+            <Typography variant="label">{name}</Typography>
             <Avatar
               sx={{
                 background: "white",
                 color: (theme) => theme.palette.custom.main,
                 mx: 1,
+                height: 30,
+                width: 30,
               }}
             >
-              U
+              {name && name[0]}
             </Avatar>
           </Box>
         </Toolbar>

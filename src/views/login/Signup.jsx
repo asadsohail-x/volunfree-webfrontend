@@ -198,7 +198,8 @@ const VolunteerSignup = ({ signup, hide }) => {
         {/* DOB */}
         <DatePicker
           label="Date Of Birth"
-          inputFormat="MM/dd/yyyy"
+          inputFormat="dd MMM yyyy"
+          disableMaskedInput
           value={volunteer.dob}
           maxDate={new Date(Date.now())}
           onChange={(dob) => setVolunteer({ ...volunteer, dob })}

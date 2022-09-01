@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import reducers from "./admin.reducers";
 
-import { axiosPut, axiosPost } from "../../api/axiosHelper";
+import { axiosPost } from "../../api/axiosHelper";
 
 export const adminSlice = createSlice({
   name: "admin",
@@ -35,6 +35,7 @@ export const loginAsync = (email, password) => async (dispatch) => {
       dispatch(endRequest());
     } else {
       dispatch(err(data.message));
+      dispatch(endRequest(false));
     }
   } catch (error) {
     console.log(error);

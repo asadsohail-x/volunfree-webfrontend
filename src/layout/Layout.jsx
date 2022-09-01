@@ -5,6 +5,7 @@ import Header from "./header/Header";
 
 import { adminRoutes, orgRoutes, volunteerRoutes } from "../router/AppRouter";
 import Sidebar from "./sidebar/Sidebar";
+import { useCookies } from "react-cookie";
 
 const LayoutRoot = styled("div")(({ theme }) => ({
   display: "flex",
@@ -36,8 +37,6 @@ const Layout = ({ children, logout, role }) => {
       </LayoutRoot>
       <Header onSidebarOpen={() => setSidebarOpen(true)} />
       <HandleSidebar
-        role={role}
-        logout={logout}
         onClose={() => setSidebarOpen(false)}
         open={isSidebarOpen}
       />
@@ -45,14 +44,21 @@ const Layout = ({ children, logout, role }) => {
   );
 };
 
-const HandleSidebar = ({ role, logout, ...rest }) => {
-  switch (role.toUpperCase()) {
-    case "ADMIN":
-      return <Sidebar routes={adminRoutes} logout={logout} {...rest} />;
-    case "VOLUNTEER":
-      return <Sidebar routes={volunteerRoutes} logout={logout} {...rest} />;
-    case "ORGANIZATION":
-      return <Sidebar routes={orgRoutes} logout={logout} {...rest} />;
+const HandleSidebar = (props) => {
+  const [cookie, , remove] = useCookies(["user"]);
+
+  const logout = () => {
+    remove("user");
+    window.location.href = "/";
+  };
+
+  switch (cookie["user"].role) {
+    case "Admin":
+      return <Sidebar routes={adminRoutes} logout={logout} {...props} />;
+    case "Volunteer":
+      return <Sidebar routes={volunteerRoutes} logout={logout} {...props} />;
+    case "Organization":
+      return <Sidebar routes={orgRoutes} logout={logout} {...props} />;
     default:
       logout();
   }

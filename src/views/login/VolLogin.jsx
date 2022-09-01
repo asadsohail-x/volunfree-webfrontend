@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -9,42 +9,69 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import Signup from "./Signup";
+import { useDispatch, useSelector } from "react-redux";
 
-const LoginHandler = ({ login, signup, role, setRole }) => {
-  const [hasSelectedRole, setHasSelectedRole] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+import { loginAsync, clear } from "../../redux/volunteer/volunteer.slice";
 
-  if (showSignup) {
-    return (
-      <Signup hide={() => setShowSignup(false)} role={role} signup={signup} />
-    );
-  }
+import Loader from "../../Loader";
+import { useCookies } from "react-cookie";
 
-  if (hasSelectedRole) {
-    return (
-      <Login
-        login={login}
-        role={role}
-        signup={() => setShowSignup(true)}
-        selectRole={() => setHasSelectedRole(false)}
-      />
-    );
-  }
-};
+import { toast } from "react-toastify";
 
-const Login = ({ login, selectRole, role, signup }) => {
+const VolLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isCheckedRememberMe, setIsCheckedRememberMe] = useState(false);
 
+  const [, setCookie] = useCookies(["user"]);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const isLoggedIn = useSelector((state) => state.volunteer.isLoggedIn);
+  const isLoading = useSelector((state) => state.volunteer.isLoading);
+  const data = useSelector((state) => state.volunteer.data);
+  const error = useSelector((state) => state.volunteer.error);
+
+  useEffect(() => {
+    if (!isLoading && error) {
+      console.log(isLoading, error);
+      toast.error(error);
+    }
+
+    return () => {
+      dispatch(clear());
+    };
+  }, [error, isLoading, dispatch]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // validate if the email and password are valid or not
-    login(email, password);
+    // Dispatch Login Action
+    dispatch(loginAsync(email, password));
   };
+
+  // handle volunteer state change
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        if (Object.keys(data).length) {
+          setCookie("user", { ...data, role: "Volunteer", loggedIn: true });
+          navigate("/");
+        } else {
+          console.log("no data");
+        }
+      } else {
+        console.log("Not Logged In");
+      }
+    }
+  }, [data, isLoading, isLoggedIn, navigate, setCookie]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Box
@@ -77,9 +104,9 @@ const Login = ({ login, selectRole, role, signup }) => {
               Sign In as{" "}
               <span
                 style={{ cursor: "pointer", fontWeight: "bold" }}
-                onClick={selectRole}
+                onClick={() => navigate("/")}
               >
-                {role}
+                Volunteer
               </span>{" "}
               to get started with Volunfree
             </Typography>
@@ -161,7 +188,7 @@ const Login = ({ login, selectRole, role, signup }) => {
               type="submit"
               variant="contained"
               sx={{ ml: 2 }}
-              onClick={signup}
+              onClick={() => navigate("/volunteer-signup")}
             >
               Sign Up
             </Button>
@@ -179,7 +206,7 @@ const Login = ({ login, selectRole, role, signup }) => {
             <Button
               color="primary"
               sx={{ m: 0 }}
-              onClick={selectRole}
+              onClick={() => navigate("/")}
               variant="outlined"
             >
               Change Role
@@ -191,4 +218,4 @@ const Login = ({ login, selectRole, role, signup }) => {
   );
 };
 
-export default LoginHandler;
+export default VolLogin;

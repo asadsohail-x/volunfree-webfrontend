@@ -36,7 +36,7 @@ const EditOpportunity = ({ handleClose, item }) => {
   });
 
   useEffect(() => {
-    setOpportunity({
+    setOpportunity(() => ({
       ...opportunity,
       title: item.title,
       date: item.date,
@@ -51,8 +51,9 @@ const EditOpportunity = ({ handleClose, item }) => {
         id: uuidv4(),
         skill,
       })),
-    });
-  }, [item]);
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.oppCategories.oppCategories);
@@ -69,6 +70,7 @@ const EditOpportunity = ({ handleClose, item }) => {
 
       setOpportunity({ ...opportunity, categoryId: selectedCategory._id });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories]);
 
   const handleSubmit = (e) => {
@@ -171,7 +173,8 @@ const EditOpportunity = ({ handleClose, item }) => {
       <InputLabel sx={{ m: 1 }}>Commitment Date</InputLabel>
       <DatePicker
         label="Date"
-        inputFormat="dd/MM/yyyy"
+        inputFormat="dd MMM yyyy"
+        disableMaskedInput
         value={opportunity.date}
         onChange={(date) => setOpportunity({ ...opportunity, date })}
         renderInput={(p) => (

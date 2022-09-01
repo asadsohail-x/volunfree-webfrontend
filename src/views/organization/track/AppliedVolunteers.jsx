@@ -56,7 +56,7 @@ const AppliedVolunteers = () => {
     } else {
       navigate("/track");
     }
-  }, [location, navigate]);
+  }, [dispatch, location, navigate]);
 
   useEffect(() => {
     if (id) {
@@ -66,7 +66,7 @@ const AppliedVolunteers = () => {
         dispatch(getOpportunities(cookie["user"]._id));
       }
     }
-  }, [id, dispatch, opportunities]);
+  }, [id, dispatch, opportunities, cookie]);
 
   if (location.state.id) {
     return (

@@ -8,6 +8,7 @@ const reducers = {
   },
   set: (state, action) => {
     state.data = action.payload;
+    state.isLoggedIn = true;
   },
   err: (state, action) => {
     state.isLoading = false;
@@ -15,6 +16,7 @@ const reducers = {
   },
   clear: (state) => {
     state.isLoading = false;
+    state.isLoggedIn = false;
     state.error = "";
     state.data = {};
   },

@@ -3,7 +3,6 @@ import { Box, Divider, IconButton, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import SearchIcon from "@mui/icons-material/Search";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import ViewOpportunity from "./ViewOpportunity";
 
@@ -14,7 +13,6 @@ import {
   filter,
 } from "../../../redux/opportunities/opportunities.slice";
 import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
 
 import OpportunitiesTable from "./OpportunitiesTable";
 
@@ -24,24 +22,17 @@ const Opportunities = ({ showMenu }) => {
 
   const [cookie] = useCookies(["user"]);
 
-  const navigate = useNavigate();
-
   const isLoading = useSelector((state) => state.opportunities.isLoading);
   const opportunities = useSelector(
     (state) => state.opportunities.opportunities
   );
   const dispatch = useDispatch();
 
-  const [draft, setDraft] = useState({});
-
-  const view = (id) => {
-    setDraft(() => opportunities.find(({ _id }) => id === _id));
-    setIsViewModalOpen(true);
-  };
+  const [draft] = useState({});
 
   useEffect(() => {
     dispatch(getOpportunities(cookie["user"]._id));
-  }, [dispatch]);
+  }, [cookie, dispatch]);
 
   const handleFilters = (text) => {
     setFilterText(text);

@@ -1,13 +1,6 @@
 import {
-  Avatar,
   Box,
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
   Table,
   TableHead,
   TableBody,
@@ -158,34 +151,6 @@ const Organizations = () => {
       )}
     </Box>
   );
-};
-
-const styles = {
-  card: {
-    width: 250,
-    height: 250,
-    m: 2,
-    boxShadow: (theme) => theme.shadows[20],
-    borderRadius: 1,
-
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-
-    transition: "0.25s all ease-in-out",
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    m: 2,
-    background: (theme) => theme.palette.custom.main,
-    borderRadius: 50,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    color: "white",
-  },
 };
 
 export default Organizations;

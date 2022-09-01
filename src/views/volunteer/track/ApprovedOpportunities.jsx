@@ -41,7 +41,7 @@ const Opportunities = () => {
 
   useEffect(() => {
     dispatch(getOpportunities(cookie["user"]._id));
-  }, [dispatch]);
+  }, [cookie, dispatch]);
 
   const handleFilters = (text) => {
     setFilterText(text);

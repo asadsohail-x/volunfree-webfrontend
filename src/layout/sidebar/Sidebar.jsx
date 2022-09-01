@@ -107,7 +107,7 @@ const SidebarContent = ({ routes, logout }) => (
           alignItems: "center",
         }}
       >
-        <img src={Logo} alt="Logo" style={{ width: "175px" }} />
+        <img src={Logo} alt="Logo" style={{ width: "225px" }} />
       </NavLink>
     </Box>
     <Divider

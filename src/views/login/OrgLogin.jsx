@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -9,42 +9,62 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
-import Signup from "./Signup";
+import { clear, loginAsync } from "../../redux/organization/organization.slice";
+import Loader from "../../Loader";
 
-const LoginHandler = ({ login, signup, role, setRole }) => {
-  const [hasSelectedRole, setHasSelectedRole] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
-
-  if (showSignup) {
-    return (
-      <Signup hide={() => setShowSignup(false)} role={role} signup={signup} />
-    );
-  }
-
-  if (hasSelectedRole) {
-    return (
-      <Login
-        login={login}
-        role={role}
-        signup={() => setShowSignup(true)}
-        selectRole={() => setHasSelectedRole(false)}
-      />
-    );
-  }
-};
-
-const Login = ({ login, selectRole, role, signup }) => {
+const OrgLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isCheckedRememberMe, setIsCheckedRememberMe] = useState(false);
 
+  const [, setCookie] = useCookies(["user"]);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const isLoggedIn = useSelector((state) => state.organization.isLoggedIn);
+  const isLoading = useSelector((state) => state.organization.isLoading);
+  const data = useSelector((state) => state.organization.data);
+  const error = useSelector((state) => state.organization.error);
+
+  useEffect(() => {
+    if (!isLoading && error) {
+      console.log(isLoading, error);
+      toast.error(error);
+    }
+
+    return () => {
+      dispatch(clear());
+    };
+  }, [error, isLoading, dispatch]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // validate if the email and password are valid or not
-    login(email, password);
+    // Dispatch Login Action
+    dispatch(loginAsync(email, password));
   };
+
+  // handle organization state change
+  useEffect(() => {
+    if (!isLoading) {
+      if (isLoggedIn) {
+        if (Object.keys(data).length) {
+          setCookie("user", { ...data, role: "Organization", loggedIn: true });
+          navigate("/");
+        }
+      }
+    }
+  }, [data, isLoading, isLoggedIn, navigate, setCookie]);
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <Box
@@ -77,9 +97,9 @@ const Login = ({ login, selectRole, role, signup }) => {
               Sign In as{" "}
               <span
                 style={{ cursor: "pointer", fontWeight: "bold" }}
-                onClick={selectRole}
+                onClick={() => navigate("/")}
               >
-                {role}
+                Organization
               </span>{" "}
               to get started with Volunfree
             </Typography>
@@ -161,7 +181,7 @@ const Login = ({ login, selectRole, role, signup }) => {
               type="submit"
               variant="contained"
               sx={{ ml: 2 }}
-              onClick={signup}
+              onClick={() => navigate("/org-signup")}
             >
               Sign Up
             </Button>
@@ -179,7 +199,7 @@ const Login = ({ login, selectRole, role, signup }) => {
             <Button
               color="primary"
               sx={{ m: 0 }}
-              onClick={selectRole}
+              onClick={() => navigate("/")}
               variant="outlined"
             >
               Change Role
@@ -191,4 +211,4 @@ const Login = ({ login, selectRole, role, signup }) => {
   );
 };
 
-export default LoginHandler;
+export default OrgLogin;

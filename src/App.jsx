@@ -60,7 +60,7 @@ const App = () => {
         const data = { ...user };
         delete data.role;
 
-        switch (role.toUpperCase()) {
+        switch (user.role.toUpperCase()) {
           case "ADMIN": {
             setIsLoading(true);
             dispatch(setAdmin(data));
@@ -76,6 +76,8 @@ const App = () => {
             dispatch(setOrg(data));
             break;
           }
+          default:
+            return <></>;
         }
 
         setLoggedIn(true);
@@ -87,8 +89,8 @@ const App = () => {
     setRole("Volunteer");
     setLoggedIn(false);
     removeCookie("user");
-    setTimeout(() => setIsLoading(false), 1000);
-  }, [cookie]);
+    setTimeout(() => setIsLoading(false), 500);
+  }, [cookie, dispatch, removeCookie]);
 
   useEffect(() => {
     if (!adminState.isLoading) {
@@ -100,7 +102,7 @@ const App = () => {
         }
       }
     }
-  }, [adminState]);
+  }, [adminState, dispatch, role, setCookie]);
 
   useEffect(() => {
     if (!volunteerState.isLoading) {
@@ -116,15 +118,19 @@ const App = () => {
         }
       }
     }
-  }, [volunteerState]);
+  }, [dispatch, role, setCookie, volunteerState]);
 
   useEffect(() => {
+    console.log(organizationState);
     if (!organizationState.isLoading) {
-      if (!organizationState.isLoggedIn) {
+      if (organizationState.error) {
+        setIsLoading(false);
+        alert(organizationState.error);
+      } else if (!organizationState.isLoggedIn) {
         if (organizationState.data.token) {
           setCookie(
             "user",
-            { ...organizationState.data, role: role },
+            { ...organizationState.data, role: "Organization" },
             { path: "/" }
           );
           setTimeout(() => setIsLoading(false), 1000);
@@ -132,7 +138,7 @@ const App = () => {
         }
       }
     }
-  }, [organizationState]);
+  }, [dispatch, organizationState, setCookie]);
 
   const login = (email, password) => {
     switch (role.toUpperCase()) {
@@ -151,6 +157,8 @@ const App = () => {
         dispatch(orgLogin(email, password));
         break;
       }
+      default:
+        return;
     }
   };
 
@@ -166,6 +174,8 @@ const App = () => {
         dispatch(orgSignup(data));
         break;
       }
+      default:
+        return;
     }
   };
 
@@ -189,6 +199,8 @@ const App = () => {
         dispatch(clearOrg());
         break;
       }
+      default:
+        return;
     }
   };
 
@@ -216,6 +228,8 @@ const App = () => {
             <OrgRouter />
           </Layout>
         );
+      default:
+        return;
     }
   }
 
